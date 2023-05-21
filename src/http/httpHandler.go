@@ -30,7 +30,22 @@ func (httpHandler HTTPHandler) StartHTTPServer() {
 	// Overview
 	r.GET("/overview/status", httpHandler.GetOverviewStatus)
 
+	r.GET("/overview/nodes/usage", httpHandler.GetNodeUsageOverview)
+
+	// Event
 	r.GET("/events", httpHandler.GetEvents) // Example : /events/?event=warning&page=1&per_page=10
+	r.GET("/events/count", httpHandler.GetNumberOfEvents)
+
+	// Nodes
+	r.GET("/nodes", httpHandler.GetNodeOverview)
+	r.GET("/node/usage/:name", httpHandler.GetNodeUsage)
+	r.GET("/node/info/:name", httpHandler.GetNodeInfo)
+	r.GET("/nodes/count", httpHandler.GetNumberOfNodes)
+
+	// Workload
+	r.GET("/workload/namespaces", httpHandler.GetNamespace)
+	r.GET("/workload", httpHandler.GetControllersByFilter) // Filtering by Namespace, Type
+	r.GET("/workload/count", httpHandler.GetNumberOfControllers)
 
 	log.Fatal(http.ListenAndServe(":9000", r))
 

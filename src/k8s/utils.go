@@ -69,3 +69,19 @@ func NodeStatus(node *corev1.Node) string {
 	}
 	return "Not Ready"
 }
+
+func (kh K8sHandler) GetNamespaceName() ([]string, error) {
+	var result []string
+
+	namespaces, err := kh.K8sClient.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	for _, namespace := range namespaces.Items {
+		result = append(result, namespace.GetName())
+	}
+
+	return result, nil
+}

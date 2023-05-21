@@ -94,3 +94,61 @@ func (kh K8sHandler) GetOverviewStatus() (cm.Overview, error) {
 
 	return result, nil
 }
+
+func (kh K8sHandler) GetNodeInfo(nodeName string) (cm.NodeInfo, error) {
+
+	var result cm.NodeInfo
+
+	node, err := kh.K8sClient.CoreV1().Nodes().Get(context.Background(), nodeName, metav1.GetOptions{})
+	if err != nil {
+		log.Println(err)
+		return result, err
+	}
+
+	result.OS = node.Status.NodeInfo.OSImage
+	result.HostName = node.ObjectMeta.Name
+	result.IP = node.Status.Addresses[0].Address
+	result.Status = isNodeReady(node)
+
+	result.KubeletVersion = node.Status.NodeInfo.KubeletVersion
+	result.ContainerRuntimeVersion = node.Status.NodeInfo.ContainerRuntimeVersion
+
+	pods, err := kh.K8sClient.CoreV1().Pods(metav1.NamespaceAll).List(context.Background(), metav1.ListOptions{FieldSelector: "spec.nodeName=" + result.HostName})
+	if err != nil {
+		log.Println(err)
+		return result, err
+	}
+	numContainers := 0
+	for _, pod := range pods.Items {
+		numContainers += len(pod.Spec.Containers)
+	}
+	result.NumContainers = numContainers
+	capacity := node.Status.Capacity
+	result.CpuCores = capacity.Cpu().Value()
+	result.RamCapacity = node.Status.Capacity.Memory().Value() / 1024 / 1024 / 1024
+
+	return result, nil
+
+}
+
+func (kh K8sHandler) NumberOfNodes() (cm.Count, error) {
+	var result cm.Count
+
+	nodes, err := kh.K8sClient.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return result, err
+	}
+
+	result.Count = len(nodes.Items)
+	return result, err
+}
+
+func (kh K8sHandler) GetControllerDetail(namespace string, name string) (cm.ControllerDetail, error) {
+
+	result, err := kh.GetVolumesOfController(namespace, name)
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
