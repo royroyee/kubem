@@ -46,6 +46,14 @@ func (httpHandler HTTPHandler) StartHTTPServer() {
 	r.GET("/workload/namespaces", httpHandler.GetNamespace)
 	r.GET("/workload", httpHandler.GetControllersByFilter) // Filtering by Namespace, Type
 	r.GET("/workload/count", httpHandler.GetNumberOfControllers)
+	r.GET("/workload/info/:namespace/:name", httpHandler.GetControllerInfo)
+	r.GET("/workload/conditions/:namespace/:name", httpHandler.GetConditions)
+	r.GET("/workload/detail/:namespace/:name", httpHandler.GetControllerDetail)
+
+	// Pod
+	r.GET("/pod/info/:name", httpHandler.GetPodInfo) // Information of Pod (detail page)
+	r.GET("/pod/usage/:name", httpHandler.GetPodUsage)
+	r.GET("/pod/logs/:namespace/:name", httpHandler.GetLogsOfPod)
 
 	log.Fatal(http.ListenAndServe(":9000", r))
 

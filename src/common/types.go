@@ -67,3 +67,35 @@ type ControllerDetail struct {
 	TemplateContainers []string `json:"template_containers"`
 	Volumes            []string `json:"volumes"`
 }
+
+type ControllerInfo struct {
+	Labels       []string `json:"labels"`
+	Limits       []string `json:"limits"`
+	Environment  []string `json:"environment"`
+	Mounts       []string `json:"mounts"`
+	Volumes      []string `json:"volumes"`
+	ControlledBy string   `json:"controlled_by"`
+}
+
+type Conditions struct {
+	Type   string `json:"type"`
+	Status string `json:"status"`
+	Reason string `json:"reason"`
+}
+
+type PodInfo struct {
+	Name       string   `json:"name"`
+	Namespace  string   `json:"namespace"`
+	Image      string   `json:"image"`
+	Node       string   `json:"node"`
+	PodIP      string   `json:"pod_ip"`
+	Restarts   int32    `json:"restarts"`
+	Volumes    []string `json:"volumes"`
+	Controller string   `json:"controller"`
+	Status     string   `json:"status"`
+}
+
+type GetPodUsage struct {
+	CpuUsage []int `json:"cpu_usage"`
+	RamUsage []int `json:"ram_usage"`
+}

@@ -240,3 +240,95 @@ func (httpHandler HTTPHandler) GetNumberOfControllers(w http.ResponseWriter, r *
 	w.Write(result)
 	w.WriteHeader(http.StatusOK)
 }
+
+func (httpHandler HTTPHandler) GetControllerInfo(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+
+	controllerType := r.URL.Query().Get("type")
+
+	controllerInfo, err := httpHandler.k8sHandler.GetControllerInfo(controllerType, params.ByName("namespace"), params.ByName("name"))
+	result, err := json.Marshal(&controllerInfo)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(result)
+	w.WriteHeader(http.StatusOK)
+}
+
+func (httpHandler HTTPHandler) GetConditions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
+	controllerType := r.URL.Query().Get("type")
+	conditions, err := httpHandler.k8sHandler.GetConditions(controllerType, ps.ByName("namespace"), ps.ByName("name"))
+	result, err := json.Marshal(&conditions)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(result)
+	w.WriteHeader(http.StatusOK)
+}
+
+func (httpHandler HTTPHandler) GetControllerDetail(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+
+	controllerInfo, err := httpHandler.k8sHandler.GetControllerDetail(params.ByName("namespace"), params.ByName("name"))
+	result, err := json.Marshal(&controllerInfo)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(result)
+	w.WriteHeader(http.StatusOK)
+}
+
+func (httpHandler HTTPHandler) GetPodInfo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
+	podInfo, err := httpHandler.k8sHandler.GetInfoOfPod(ps.ByName("name"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	result, err := json.Marshal(&podInfo)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(result)
+	w.WriteHeader(http.StatusOK)
+}
+
+func (httpHandler HTTPHandler) GetPodUsage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
+	podUsage, err := httpHandler.k8sHandler.GetPodUsageDetail(ps.ByName("name"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	result, err := json.Marshal(&podUsage)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(result)
+	w.WriteHeader(http.StatusOK)
+}
+
+func (httpHandler HTTPHandler) GetLogsOfPod(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
+	logsOfPod, err := httpHandler.k8sHandler.GetLogsOfPod(ps.ByName("namespace"), ps.ByName("name"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	result, err := json.Marshal(&logsOfPod)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(result)
+	w.WriteHeader(http.StatusOK)
+}

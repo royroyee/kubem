@@ -254,3 +254,49 @@ func (kh K8sHandler) NumberOfControllers(namespace string, controllerType string
 	result.Count = count
 	return result, nil
 }
+
+func (kh K8sHandler) GetInfoOfPod(podName string) (cm.PodInfo, error) {
+	var result = cm.PodInfo{}
+
+	filter := bson.M{"name": podName}
+	collection := kh.session.DB("kubem").C("podinfo")
+
+	err := collection.Find(filter).One(&result)
+	if err != nil {
+		log.Println(err)
+		return result, err
+	}
+	return result, nil
+}
+
+func (kh K8sHandler) GetPodUsageDetail(podName string) (cm.GetPodUsage, error) {
+	var result cm.GetPodUsage
+	collection := kh.session.DB("kubem").C("podusage")
+
+	pipeline := collection.Pipe([]bson.M{
+		{"$match": bson.M{"name": podName}},
+		{"$limit": 24},
+		{"$project": bson.M{
+			"_id":      nil,
+			"cpuusage": 1,
+			"ramusage": 1,
+		}},
+	})
+
+	// Extract the result
+	var getUsage []bson.M
+	err := pipeline.All(&getUsage)
+	if err != nil {
+		log.Println(err)
+		return result, err
+	}
+	for _, usage := range getUsage {
+		CpuUsage := int(usage["cpuusage"].(int64))
+		result.CpuUsage = append(result.CpuUsage, CpuUsage)
+
+		RamUsage := int(usage["ramusage"].(int64))
+		result.RamUsage = append(result.RamUsage, RamUsage)
+	}
+
+	return result, nil
+}
