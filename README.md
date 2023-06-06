@@ -15,8 +15,16 @@ With Kubem, you can effortlessly monitor the resources and performance of your K
 	- Metrics
 	- Events
 
+- Kubernetes API client for retrieving data from the cluster (using [client-go](https://github.com/kubernetes/client-go))
+- DB handler for storing K8s information and data
+- Providing REST API for frontend
+
 ## Installation
 - Dockerfile 
+
+### MongoDB
+Kubem uses MongoDB in order to store and retrieve data. Therefore there must be an MongoDB instance (a containered one or just the native one) that shall be running for Kubem
+
 
 
 
@@ -24,4 +32,4 @@ With Kubem, you can effortlessly monitor the resources and performance of your K
 - [Younghwan Kim](https://github.com/royroyee)
 
 ## License
-MIT License
+[MIT License](https://github.com/royroyee/kubem/blob/main/LICENSE)
